@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Impossible Triangle — 不可能三角</title>
+<meta name="description" content="Interactive guide to the Impossible Triangle: why you can never optimize three things at once. 20+ examples across AI, engineering, economics, and life. 不可能三角交互指南。">
+<meta property="og:title" content="The Impossible Triangle — 不可能三角">
+<meta property="og:description" content="Why you can never have it all — 20+ examples across AI, engineering, economics, and life.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23f8f6f0'/><polygon points='32,12 52,48 12,48' fill='none' stroke='%231a1a1a' stroke-width='2.5'/><circle cx='32' cy='14' r='3' fill='%23e04040'/><circle cx='52' cy='48' r='3' fill='%232060c0'/><circle cx='12' cy='48' r='3' fill='%2320a060'/></svg>">
+<script defer src="https://analytics-dashboard-two-blue.vercel.app/tracker.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@200;300;400;500;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f6f0;--bg2:#f0ece4;--ink:#1a1a1a;--ink2:#444;--dim:#8a8880;--faint:#d8d4c8;
+  --a:#e04040;--b:#2060c0;--c:#20a060;
+  --a-bg:rgba(224,64,64,.06);--b-bg:rgba(32,96,192,.06);--c-bg:rgba(32,160,96,.06);
+  --rule:rgba(26,26,26,.06);
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Geist',sans-serif;font-weight:400;line-height:1.75;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.cn{font-family:'Noto Sans SC',sans-serif;}
+h1,h2,h3{font-family:'Instrument Serif',serif;font-weight:400;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.rv.vis{opacity:1;transform:translateY(0);}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.22s}.rv.d3{transition-delay:.36s}
+
+section{max-width:960px;margin:0 auto;padding:80px 48px;position:relative;}
+@media(max-width:700px){section{padding:50px 20px;}}
+.sec-label{font-family:'IBM Plex Mono',monospace;font-size:.6rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem;}
+h2{font-size:clamp(1.6rem,3.2vw,2.4rem);letter-spacing:-.02em;margin-bottom:.3rem;}
+.h2cn{font-family:'Noto Sans SC',sans-serif;font-weight:200;font-size:clamp(.85rem,1.5vw,1rem);color:var(--dim);margin-bottom:2rem;}
+
+/* ═══ HERO ═══ */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding-top:40px;}
+.hero-triangle{width:200px;height:180px;margin-bottom:32px;position:relative;}
+.hero-triangle svg{width:100%;height:100%;}
+h1.hero-t{font-size:clamp(2.4rem,5.5vw,4rem);line-height:1.1;letter-spacing:-.02em;}
+h1.hero-t em{font-style:italic;}
+.hero-cn{font-family:'Noto Sans SC',sans-serif;font-weight:200;font-size:clamp(1rem,2vw,1.3rem);color:var(--dim);margin-top:8px;}
+.hero-desc{max-width:520px;margin-top:20px;font-size:.95rem;color:var(--ink2);}
+.hero-rule{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.15rem;color:var(--ink);margin-top:28px;padding:12px 28px;border:1px solid var(--faint);border-radius:100px;}
+
+/* ═══ INTERACTIVE TRIANGLE ═══ */
+.tri-interactive{
+  background:#fff;border:1px solid var(--rule);border-radius:18px;
+  padding:32px;box-shadow:var(--shadow);margin-top:28px;
+}
+.tri-canvas-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.tri-canvas-wrap canvas{max-width:100%;}
+.sliders{display:flex;flex-direction:column;gap:12px;}
+.slider-row{display:flex;align-items:center;gap:14px;}
+.slider-label{width:100px;font-size:.82rem;font-weight:600;flex-shrink:0;}
+.slider-row input[type=range]{flex:1;height:6px;-webkit-appearance:none;background:var(--bg2);border-radius:3px;outline:none;}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+.sl-a::-webkit-slider-thumb{background:var(--a);}.sl-b::-webkit-slider-thumb{background:var(--b);}.sl-c::-webkit-slider-thumb{background:var(--c);}
+.slider-val{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--dim);width:36px;text-align:right;}
+.tri-note{text-align:center;font-size:.78rem;color:var(--dim);margin-top:12px;font-style:italic;}
+.tri-note-cn{text-align:center;font-family:'Noto Sans SC',sans-serif;font-size:.72rem;color:var(--dim);margin-top:4px;}
+
+/* ═══ EXAMPLE GRID ═══ */
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:24px;}
+.ex-card{
+  background:#fff;border:1px solid var(--rule);border-radius:14px;
+  padding:22px 20px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s;
+}
+.ex-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.ex-card .ex-cat{font-family:'IBM Plex Mono',monospace;font-size:.55rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+.ex-card h3{font-family:'Geist',sans-serif;font-size:.92rem;font-weight:600;margin-bottom:8px;}
+.ex-card .tri-labels{display:flex;gap:6px;margin-bottom:10px;}
+.tri-lbl{font-size:.6rem;font-weight:600;padding:3px 8px;border-radius:4px;}
+.lbl-a{background:var(--a-bg);color:var(--a);}.lbl-b{background:var(--b-bg);color:var(--b);}.lbl-c{background:var(--c-bg);color:var(--c);}
+.ex-card p{font-size:.8rem;color:var(--ink2);line-height:1.65;}
+.ex-card .cn-text{font-family:'Noto Sans SC',sans-serif;font-size:.72rem;color:var(--dim);margin-top:6px;}
+
+/* ═══ PRINCIPLE CARDS ═══ */
+.prin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px;}
+@media(max-width:700px){.prin-grid{grid-template-columns:1fr;}}
+.prin-card{
+  background:#fff;border:1px solid var(--rule);border-radius:14px;
+  padding:24px 22px;box-shadow:var(--shadow);
+}
+.prin-card h3{font-family:'Geist',sans-serif;font-size:.9rem;font-weight:600;margin-bottom:6px;}
+.prin-card p{font-size:.82rem;color:var(--ink2);}
+.prin-card .cn-text{font-family:'Noto Sans SC',sans-serif;font-size:.75rem;color:var(--dim);margin-top:6px;}
+
+/* ═══ BREAKING ═══ */
+.break-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px;}
+@media(max-width:700px){.break-grid{grid-template-columns:1fr;}}
+.break-card{
+  background:#fff;border:1px solid var(--rule);border-radius:12px;
+  padding:20px 18px;text-align:center;box-shadow:var(--shadow);
+}
+.break-card .break-icon{font-size:1.4rem;margin-bottom:8px;}
+.break-card h3{font-family:'Geist',sans-serif;font-size:.82rem;font-weight:600;margin-bottom:4px;}
+.break-card p{font-size:.75rem;color:var(--dim);}
+.break-card .cn-text{font-family:'Noto Sans SC',sans-serif;font-size:.68rem;color:var(--dim);margin-top:4px;}
+
+footer{text-align:center;padding:50px 48px;border-top:1px solid var(--rule);max-width:960px;margin:0 auto;}
+footer p{font-size:.72rem;color:var(--dim);}
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-triangle rv">
+    <svg viewBox="0 0 200 180">
+      <polygon points="100,10 190,170 10,170" fill="none" stroke="#1a1a1a" stroke-width="2" opacity=".15"/>
+      <circle cx="100" cy="10" r="8" fill="var(--a)" opacity=".8"/><text x="100" y="7" text-anchor="middle" font-size="7" fill="var(--a)" font-family="Geist" font-weight="600" dy="-6">A</text>
+      <circle cx="190" cy="170" r="8" fill="var(--b)" opacity=".8"/><text x="190" y="170" text-anchor="start" font-size="7" fill="var(--b)" font-family="Geist" font-weight="600" dx="8">B</text>
+      <circle cx="10" cy="170" r="8" fill="var(--c)" opacity=".8"/><text x="10" y="170" text-anchor="end" font-size="7" fill="var(--c)" font-family="Geist" font-weight="600" dx="-8">C</text>
+    </svg>
+  </div>
+  <h1 class="hero-t rv d1">The Impossible <em>Triangle</em></h1>
+  <div class="hero-cn rv d2">不可能三角 — 你永远无法同时拥有全部</div>
+  <p class="hero-desc rv d2">
+    In every system — from engineering to economics to life itself —
+    there are three desirable qualities you can never fully achieve at the same time.
+    Pick any two. The third suffers. Always.
+  </p>
+  <div class="hero-rule rv d3">Pick two. Sacrifice one.</div>
+</section>
+
+<!-- ═══ INTERACTIVE SIMULATOR ═══ -->
+<section>
+  <div class="sec-label rv">Interactive 交互模拟</div>
+  <h2 class="rv d1">Try It Yourself</h2>
+  <div class="h2cn rv d2">拖动滑块感受三角约束 — 当一个维度增加时，其他必须减少</div>
+
+  <div class="tri-interactive rv d1">
+    <div class="tri-canvas-wrap"><canvas id="triCanvas" width="400" height="350"></canvas></div>
+    <div class="sliders">
+      <div class="slider-row"><span class="slider-label" style="color:var(--a);">Quality 质量</span><input type="range" class="sl-a" id="slA" min="0" max="100" value="70"><span class="slider-val" id="valA">70</span></div>
+      <div class="slider-row"><span class="slider-label" style="color:var(--b);">Speed 速度</span><input type="range" class="sl-b" id="slB" min="0" max="100" value="50"><span class="slider-val" id="valB">50</span></div>
+      <div class="slider-row"><span class="slider-label" style="color:var(--c);">Cost 成本</span><input type="range" class="sl-c" id="slC" min="0" max="100" value="30"><span class="slider-val" id="valC">30</span></div>
+    </div>
+    <div class="tri-note" id="triNote">Budget: 150 / 150 — balanced</div>
+    <div class="tri-note-cn">总预算固定为150 — 增加一项必须减少另一项</div>
+  </div>
+</section>
+
+<!-- ═══ 20+ EXAMPLES ═══ -->
+<section>
+  <div class="sec-label rv">Examples 案例</div>
+  <h2 class="rv d1">20 Impossible Triangles Across Every Domain</h2>
+  <div class="h2cn rv d2">跨越每个领域的20个不可能三角</div>
+
+  <div class="ex-grid">
+    <div class="ex-card rv"><div class="ex-cat">Software 软件工程</div><h3>Project Management</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Fast</span><span class="tri-lbl lbl-b">Good</span><span class="tri-lbl lbl-c">Cheap</span></div><p>The original iron triangle. Want it fast and good? It won't be cheap. Fast and cheap? Quality drops. Good and cheap? It takes forever.</p><div class="cn-text">项目管理铁三角。又快又好？不便宜。又快又便宜？质量下降。又好又便宜？需要很长时间。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Blockchain 区块链</div><h3>Blockchain Trilemma</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Security</span><span class="tri-lbl lbl-b">Scalability</span><span class="tri-lbl lbl-c">Decentralization</span></div><p>Bitcoin: secure + decentralized but slow. Solana: fast + secure but more centralized. Ethereum tries to balance all three with L2s.</p><div class="cn-text">比特币：安全+去中心化但慢。Solana：快+安全但更中心化。以太坊通过L2尝试平衡三者。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">AI 人工智能</div><h3>AI Model Design</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Accuracy</span><span class="tri-lbl lbl-b">Speed</span><span class="tri-lbl lbl-c">Size</span></div><p>GPT-4 is accurate but slow and huge. A tiny model is fast and small but less accurate. You can't have all three — distillation is the art of choosing where to compromise.</p><div class="cn-text">GPT-4准确但慢且巨大。小模型快且小但不太准确。蒸馏是选择在哪里妥协的艺术。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Economics 经济学</div><h3>Mundell's Trilemma</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Fixed Exchange Rate</span><span class="tri-lbl lbl-b">Free Capital Flow</span><span class="tri-lbl lbl-c">Monetary Independence</span></div><p>A country can only have two of three: China picks fixed rate + monetary independence (restricts capital). US picks free capital + independence (floating rate).</p><div class="cn-text">一个国家只能拥有三者中的两个：中国选择固定汇率+货币独立（限制资本流动）。美国选择自由资本+独立（浮动汇率）。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Databases 数据库</div><h3>CAP Theorem</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Consistency</span><span class="tri-lbl lbl-b">Availability</span><span class="tri-lbl lbl-c">Partition Tolerance</span></div><p>Brewer's theorem (proven 2002): a distributed system can guarantee at most two of three. MongoDB picks CP. Cassandra picks AP. Network partitions are unavoidable, so you always sacrifice C or A.</p><div class="cn-text">Brewer定理（2002年证明）：分布式系统最多保证三者中的两个。MongoDB选CP。Cassandra选AP。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Automotive 汽车</div><h3>Car Design</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Performance</span><span class="tri-lbl lbl-b">Efficiency</span><span class="tri-lbl lbl-c">Affordability</span></div><p>A Tesla Model S is fast + efficient but not affordable. A Corolla is efficient + affordable but not fast. A Lamborghini is fast + premium but not efficient.</p><div class="cn-text">特斯拉Model S快+高效但不便宜。卡罗拉高效+实惠但不快。兰博基尼快+高端但不高效。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Tires 轮胎</div><h3>Tire Engineering</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Grip</span><span class="tri-lbl lbl-b">Durability</span><span class="tri-lbl lbl-c">Low Rolling Resistance</span></div><p>Soft compound = more grip but wears fast. Hard compound = durable but less grip. Low resistance = fuel efficient but less grip. F1 teams choose compound per race — there's no universal answer.</p><div class="cn-text">软配方=更多抓地力但磨损快。硬配方=耐用但抓地力少。F1车队每场比赛选择配方——没有通用答案。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Healthcare 医疗</div><h3>Healthcare System</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Quality</span><span class="tri-lbl lbl-b">Access</span><span class="tri-lbl lbl-c">Cost</span></div><p>US: high quality, high cost, limited access. UK (NHS): universal access, low cost, sometimes lower quality/longer waits. No country has solved all three.</p><div class="cn-text">美国：高质量、高成本、有限可及性。英国NHS：全民覆盖、低成本、有时质量低/等待长。没有国家解决了三者。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Semiconductor 半导体</div><h3>Chip Design</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Performance</span><span class="tri-lbl lbl-b">Power Efficiency</span><span class="tri-lbl lbl-c">Die Size (Cost)</span></div><p>More transistors = more performance but more power and cost. Apple's M-series chips optimize power efficiency by accepting larger die sizes. Intel historically chased raw performance.</p><div class="cn-text">更多晶体管=更高性能但更多功耗和成本。苹果M系列通过接受更大芯片面积来优化能效。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Food 饮食</div><h3>Food Choices</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Healthy</span><span class="tri-lbl lbl-b">Tasty</span><span class="tri-lbl lbl-c">Cheap</span></div><p>Healthy + tasty (organic salmon) isn't cheap. Tasty + cheap (fast food) isn't healthy. Healthy + cheap (beans and rice) isn't always exciting.</p><div class="cn-text">健康+美味（有机三文鱼）不便宜。美味+便宜（快餐）不健康。健康+便宜（豆饭）不总是令人兴奋。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Platforms 平台</div><h3>Social Media</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Content Quality</span><span class="tri-lbl lbl-b">Engagement</span><span class="tri-lbl lbl-c">Free Speech</span></div><p>High quality + free speech (early Twitter) had low engagement signals. High engagement + free speech breeds toxicity. High quality + engagement requires heavy moderation (restricting speech).</p><div class="cn-text">高质量+言论自由=低参与度信号。高参与度+言论自由滋生毒性。高质量+高参与度需要重度审核。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Startup 创业</div><h3>Startup Strategy</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Growth</span><span class="tri-lbl lbl-b">Profitability</span><span class="tri-lbl lbl-c">Control</span></div><p>Fast growth usually requires VC funding (losing control and profitability). Profitable + controlled (bootstrapped) grows slower. Fast growth + profitable is extremely rare — those are unicorns.</p><div class="cn-text">快速增长通常需要风投资金（失去控制和盈利性）。盈利+控制（自力更生）增长更慢。快速增长+盈利极其罕见。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Energy 能源</div><h3>Energy Production</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Clean</span><span class="tri-lbl lbl-b">Reliable</span><span class="tri-lbl lbl-c">Cheap</span></div><p>Solar is clean + increasingly cheap but not reliable (intermittent). Gas is reliable + cheap but not clean. Nuclear is clean + reliable but not cheap (upfront cost).</p><div class="cn-text">太阳能清洁+越来越便宜但不可靠（间歇性）。天然气可靠+便宜但不清洁。核能清洁+可靠但不便宜。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Security 安全</div><h3>Cybersecurity</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Security</span><span class="tri-lbl lbl-b">Usability</span><span class="tri-lbl lbl-c">Privacy</span></div><p>Highly secure + private (end-to-end encryption) is hard to use. Secure + usable (biometrics) sacrifices privacy. Private + usable (anonymous browsing) is harder to secure.</p><div class="cn-text">高安全+隐私（端到端加密）难以使用。安全+易用（生物识别）牺牲隐私。隐私+易用更难保障安全。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Education 教育</div><h3>Education System</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Depth</span><span class="tri-lbl lbl-b">Breadth</span><span class="tri-lbl lbl-c">Speed</span></div><p>Deep + broad education (PhD + MBA) takes forever. Deep + fast (bootcamp) is narrow. Broad + fast (survey courses) is shallow. Learning has a fixed budget of time.</p><div class="cn-text">深度+广度教育需要很长时间。深度+快速是狭窄的。广度+快速是浅显的。学习有固定的时间预算。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Government 政府</div><h3>Governance</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Efficiency</span><span class="tri-lbl lbl-b">Democracy</span><span class="tri-lbl lbl-c">Stability</span></div><p>Efficient + stable autocracies sacrifice democracy. Democratic + stable systems are often slow. Efficient + democratic systems can be unstable (populist swings).</p><div class="cn-text">高效+稳定的专制牺牲民主。民主+稳定的系统往往缓慢。高效+民主的系统可能不稳定。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Photography 摄影</div><h3>Exposure Triangle</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Aperture</span><span class="tri-lbl lbl-b">Shutter Speed</span><span class="tri-lbl lbl-c">ISO</span></div><p>Wide aperture (bokeh) + fast shutter needs high ISO (noise). Low ISO + fast shutter needs wide aperture (shallow depth). Every photo is a three-way trade-off.</p><div class="cn-text">大光圈（虚化）+快门速度需要高ISO（噪点）。低ISO+快门速度需要大光圈。每张照片都是三方权衡。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Life 人生</div><h3>Work-Life Triangle</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Career</span><span class="tri-lbl lbl-b">Health</span><span class="tri-lbl lbl-c">Relationships</span></div><p>Ambitious career + deep relationships leaves no time for health. Career + health (gym, sleep) means less social time. Health + relationships means career takes a backseat.</p><div class="cn-text">事业心+深度关系没有时间锻炼。事业+健康意味着更少社交。健康+关系意味着事业退居其次。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Sleep 睡眠</div><h3>College Life</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Good Grades</span><span class="tri-lbl lbl-b">Social Life</span><span class="tri-lbl lbl-c">Enough Sleep</span></div><p>The universal college joke — pick two. Study + socialize = no sleep. Study + sleep = no social life. Socialize + sleep = bad grades. Every student knows this.</p><div class="cn-text">大学生的普遍笑话——选两个。学习+社交=没有睡眠。学习+睡眠=没有社交。社交+睡眠=成绩差。</div></div>
+
+    <div class="ex-card rv"><div class="ex-cat">Housing 住房</div><h3>Housing Choice</h3><div class="tri-labels"><span class="tri-lbl lbl-a">Location</span><span class="tri-lbl lbl-b">Space</span><span class="tri-lbl lbl-c">Affordable</span></div><p>Central + spacious = expensive. Central + affordable = tiny. Spacious + affordable = far from the city. This is why housing is a crisis everywhere.</p><div class="cn-text">市中心+宽敞=昂贵。市中心+实惠=狭小。宽敞+实惠=远离市区。这就是为什么住房到处都是危机。</div></div>
+  </div>
+</section>
+
+<!-- ═══ WHY THEY EXIST ═══ -->
+<section>
+  <div class="sec-label rv">Why 为什么</div>
+  <h2 class="rv d1">Why Impossible Triangles Must Exist</h2>
+  <div class="h2cn rv d2">不可能三角为什么必然存在</div>
+
+  <div class="prin-grid">
+    <div class="prin-card rv"><h3>&#9889; Finite Resources</h3><p>Every system operates with limited energy, time, money, or attention. Allocating more to one dimension means less for others. This is conservation of energy applied to design.</p><div class="cn-text">每个系统都在有限的能量、时间、金钱或注意力下运作。分配更多给一个维度意味着其他维度更少。</div></div>
+    <div class="prin-card rv d1"><h3>&#128202; Pareto Optimality</h3><p>Once you're on the Pareto frontier, you can't improve one dimension without worsening another. Most real-world systems are already near their Pareto boundaries — that's why trade-offs feel inevitable.</p><div class="cn-text">一旦你在帕累托前沿，你不能在不恶化另一个维度的情况下改善一个维度。</div></div>
+    <div class="prin-card rv d2"><h3>&#128300; Physics Says So</h3><p>The second law of thermodynamics: you can't create order in one place without creating disorder elsewhere. Every optimization has an entropy cost. There are no free lunches in physics.</p><div class="cn-text">热力学第二定律：你不能在一个地方创造秩序而不在其他地方制造无序。每次优化都有熵的代价。</div></div>
+    <div class="prin-card rv d3"><h3>&#129504; Complexity Theory</h3><p>In complex systems, variables are coupled. Optimizing one creates emergent effects on others. The more complex the system, the more trade-offs it contains. Simplicity is itself a trade-off against capability.</p><div class="cn-text">在复杂系统中，变量是耦合的。优化一个会对其他变量产生涌现效应。系统越复杂，包含的权衡越多。</div></div>
+  </div>
+</section>
+
+<!-- ═══ BREAKING THE TRIANGLE ═══ -->
+<section>
+  <div class="sec-label rv">Breaking It 突破</div>
+  <h2 class="rv d1">Can You Break the Triangle?</h2>
+  <div class="h2cn rv d2">你能突破不可能三角吗？— 有时可以，但只是移动了约束</div>
+
+  <div class="break-grid">
+    <div class="break-card rv"><div class="break-icon">&#128161;</div><h3>Technology Leap</h3><p>New tech expands the frontier. EVs broke the performance/efficiency trade-off — but introduced range/cost.</p><div class="cn-text">新技术扩展前沿。电动车突破了性能/效率权衡——但引入了续航/成本。</div></div>
+    <div class="break-card rv d1"><div class="break-icon">&#128296;</div><h3>New Materials</h3><p>Carbon fiber is strong + light — but expensive. Graphene promises to break constraints but isn't scalable yet.</p><div class="cn-text">碳纤维强+轻——但昂贵。石墨烯有望突破约束但尚未可规模化。</div></div>
+    <div class="break-card rv d2"><div class="break-icon">&#129302;</div><h3>Better Algorithms</h3><p>Transformers "broke" the accuracy/speed trade-off for NLP. But they introduced the compute/cost constraint. New triangle, same law.</p><div class="cn-text">Transformer"突破"了NLP的准确性/速度权衡。但引入了计算/成本约束。新三角，同一法则。</div></div>
+    <div class="break-card rv"><div class="break-icon">&#9200;</div><h3>Time Shifting</h3><p>You can have all three — just not at the same time. Build quality first (slow + expensive), then optimize cost (economies of scale), then speed (process maturity).</p><div class="cn-text">你可以拥有三者——只是不能同时。先建质量，然后优化成本（规模经济），然后速度。</div></div>
+    <div class="break-card rv d1"><div class="break-icon">&#127758;</div><h3>Reframe the Problem</h3><p>Sometimes the triangle is wrong. AirPods aren't cheap or hi-fi — they redefined "convenience" as the dimension that matters. Change the axes, change the game.</p><div class="cn-text">有时三角本身是错的。AirPods既不便宜也非高保真——它们重新定义了"便利性"为重要维度。</div></div>
+    <div class="break-card rv d2"><div class="break-icon">&#9878;</div><h3>Accept the Law</h3><p>The deepest wisdom: stop trying to break the triangle. Choose your two dimensions deliberately. Make the sacrifice explicit. That's strategy.</p><div class="cn-text">最深的智慧：停止试图打破三角。有意识地选择你的两个维度。明确牺牲。这就是战略。</div></div>
+  </div>
+</section>
+
+<!-- ═══ CLOSING ═══ -->
+<section style="text-align:center;">
+  <div class="rv" style="font-family:'Instrument Serif',serif;font-style:italic;font-size:clamp(1.2rem,2.5vw,1.8rem);max-width:480px;margin:0 auto;color:var(--ink2);line-height:1.5;">
+    "Strategy is not about what you choose to do.<br>It's about what you choose <em>not</em> to do."
+  </div>
+  <p class="rv d1 cn" style="color:var(--dim);font-size:.9rem;margin-top:12px;">"战略不在于你选择做什么，而在于你选择不做什么。"</p>
+  <p class="rv d2" style="color:var(--dim);font-size:.82rem;margin-top:4px;">— Michael Porter</p>
+</section>
+
+<footer>
+  <p>The Impossible Triangle &mdash; 不可能三角</p>
+  <p style="margin-top:4px;opacity:.4;">&copy; 2026</p>
+  <p style="margin-top:.8rem;"><a href="https://github.com/gewenbo888/impossible-triangle" target="_blank" style="color:var(--dim);font-size:.68rem;letter-spacing:.08em;text-decoration:none;border:1px solid var(--faint);padding:6px 16px;border-radius:100px;transition:all .3s;display:inline-block;" onmouseover="this.style.borderColor='rgba(224,64,64,.3)';this.style.color='var(--a)'" onmouseout="this.style.borderColor='var(--faint)';this.style.color='var(--dim)'">View on GitHub &rarr;</a></p>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.05});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+// ═══ INTERACTIVE TRIANGLE ═══
+(function(){
+  const canvas=document.getElementById('triCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=400,H=350;
+  const slA=document.getElementById('slA');
+  const slB=document.getElementById('slB');
+  const slC=document.getElementById('slC');
+  const valA=document.getElementById('valA');
+  const valB=document.getElementById('valB');
+  const valC=document.getElementById('valC');
+  const note=document.getElementById('triNote');
+  const BUDGET=150;
+
+  function draw(){
+    const a=+slA.value,b=+slB.value,c=+slC.value;
+    const total=a+b+c;
+    valA.textContent=a;valB.textContent=b;valC.textContent=c;
+
+    const overBudget=total>BUDGET;
+    note.textContent=`Budget: ${total} / ${BUDGET} — ${overBudget?'⚠ OVER BUDGET! Something must give.':total===BUDGET?'perfectly balanced':'room to allocate'}`;
+    note.style.color=overBudget?'#e04040':'#8a8880';
+
+    ctx.clearRect(0,0,W,H);
+    const cx=W/2,cy=H/2+10;
+    const R=130;
+
+    // Triangle outline
+    const pts=[
+      {x:cx,y:cy-R},                          // top (A)
+      {x:cx+R*Math.cos(Math.PI/6),y:cy+R*Math.sin(Math.PI/6)},  // bottom-right (B)
+      {x:cx-R*Math.cos(Math.PI/6),y:cy+R*Math.sin(Math.PI/6)},  // bottom-left (C)
+    ];
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x,pts[0].y);
+    ctx.lineTo(pts[1].x,pts[1].y);
+    ctx.lineTo(pts[2].x,pts[2].y);
+    ctx.closePath();
+    ctx.strokeStyle='rgba(26,26,26,.08)';ctx.lineWidth=1.5;ctx.stroke();
+
+    // Filled triangle based on values
+    const scale=v=>Math.max(v/100,.05);
+    const sa=scale(a),sb=scale(b),sc=scale(c);
+    const ip={
+      x:cx*sa+pts[1].x*sb+pts[2].x*sc,
+      y:pts[0].y*sa+pts[1].y*sb+pts[2].y*sc
+    };
+    const denom=sa+sb+sc;
+    ip.x/=denom;ip.y/=denom;
+
+    // Draw filled area
+    const fillPts=[
+      {x:pts[0].x+(ip.x-pts[0].x)*(1-sa),y:pts[0].y+(ip.y-pts[0].y)*(1-sa)},
+      {x:pts[1].x+(ip.x-pts[1].x)*(1-sb),y:pts[1].y+(ip.y-pts[1].y)*(1-sb)},
+      {x:pts[2].x+(ip.x-pts[2].x)*(1-sc),y:pts[2].y+(ip.y-pts[2].y)*(1-sc)},
+    ];
+    ctx.beginPath();
+    ctx.moveTo(fillPts[0].x,fillPts[0].y);
+    ctx.lineTo(fillPts[1].x,fillPts[1].y);
+    ctx.lineTo(fillPts[2].x,fillPts[2].y);
+    ctx.closePath();
+    ctx.fillStyle=overBudget?'rgba(224,64,64,.08)':'rgba(26,26,26,.04)';
+    ctx.fill();
+    ctx.strokeStyle=overBudget?'rgba(224,64,64,.3)':'rgba(26,26,26,.12)';
+    ctx.lineWidth=1;ctx.stroke();
+
+    // Vertex dots and labels
+    const colors=['#e04040','#2060c0','#20a060'];
+    const labels=[`Quality ${a}%`,`Speed ${b}%`,`Cost ${c}%`];
+    const vals=[a,b,c];
+    pts.forEach((p,i)=>{
+      // Radius based on value
+      const r=6+vals[i]*.15;
+      ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+      ctx.fillStyle=colors[i];ctx.globalAlpha=.15+vals[i]*.006;ctx.fill();ctx.globalAlpha=1;
+      ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+      ctx.fillStyle=colors[i];ctx.fill();
+
+      ctx.font='600 11px Geist';ctx.fillStyle=colors[i];ctx.textAlign='center';
+      const ly=i===0?p.y-r-8:p.y+r+14;
+      ctx.fillText(labels[i],p.x,ly);
+    });
+
+    // Center point
+    ctx.beginPath();ctx.arc(ip.x,ip.y,3,0,Math.PI*2);
+    ctx.fillStyle=overBudget?'#e04040':'#1a1a1a';ctx.fill();
+  }
+
+  // Constrain: when one slider moves up, auto-reduce others
+  function constrain(changed){
+    let a=+slA.value,b=+slB.value,c=+slC.value;
+    const total=a+b+c;
+    if(total>BUDGET){
+      const excess=total-BUDGET;
+      if(changed==='a'){const ratio=b/(b+c||1);slB.value=Math.max(0,Math.round(b-excess*ratio));slC.value=Math.max(0,Math.round(c-excess*(1-ratio)));}
+      else if(changed==='b'){const ratio=a/(a+c||1);slA.value=Math.max(0,Math.round(a-excess*ratio));slC.value=Math.max(0,Math.round(c-excess*(1-ratio)));}
+      else{const ratio=a/(a+b||1);slA.value=Math.max(0,Math.round(a-excess*ratio));slB.value=Math.max(0,Math.round(b-excess*(1-ratio)));}
+    }
+    draw();
+  }
+
+  slA.addEventListener('input',()=>constrain('a'));
+  slB.addEventListener('input',()=>constrain('b'));
+  slC.addEventListener('input',()=>constrain('c'));
+  draw();
+})();
+</script>
+</body>
+</html>
